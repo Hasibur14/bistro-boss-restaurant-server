@@ -27,10 +27,24 @@ async function run() {
     try {
 
 
+        const userCollection = client.db('bistroDB').collection('users')
         const menuCollection = client.db('bistroDB').collection('menu')
-        const reviewsCollection = client.db('bistroDB').collection('reviews');
+        const reviewCollection = client.db('bistroDB').collection('reviews');
         const cartCollection = client.db('bistroDB').collection('carts');
 
+        //user related api
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            // insert email if user does not exits
+            const query = { email: user.email }
+            const existingUser = await userCollection.findOne(query)
+            if (existingUser) {
+                return res.send({ message: 'User already exits', insertedId: null })
+            }
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+
+        });
 
         //MENU COLLECTIONS :
         app.get('/menu', async (req, res) => {
@@ -38,7 +52,11 @@ async function run() {
             res.send(result)
         });
 
-
+        //review api
+        app.get('/reviews', async (req, res) => {
+            const result = await reviewCollection.find().toArray();
+            res.send(result);
+        })
 
         //CARTS COLLECTIONS:
 
