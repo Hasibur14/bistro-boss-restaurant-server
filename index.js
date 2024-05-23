@@ -44,7 +44,7 @@ async function run() {
 
         //Middleware related api...
         const verifyToken = (req, res, next) => {
-            console.log('inside verify token', req.headers.authorization)
+            // console.log('inside verify token', req.headers.authorization)
             if (!req.headers.authorization) {
                 return res.status(401).send({ message: 'unauthorized access' })
             }
@@ -78,13 +78,13 @@ async function run() {
          */
 
         app.get('/users', verifyAdmin, verifyToken, async (req, res) => {
-            console.log(req.headers);
+            // console.log(req.headers);
             const result = await userCollection.find().toArray()
             res.send(result)
         });
 
 
-        app.get('/userss/admin/:email', verifyToken, async (req, res) => {
+        app.get('/users/admin/:email', verifyToken, async (req, res) => {
             const email = req.params.email
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: 'forbidden access' })
@@ -139,6 +139,12 @@ async function run() {
         */
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray()
+            res.send(result)
+        });
+
+        app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
+            const item = req.body
+            const result = await menuCollection.insertOne(item)
             res.send(result)
         });
 
